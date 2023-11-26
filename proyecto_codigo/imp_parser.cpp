@@ -294,7 +294,7 @@ Stm* Parser::parseStatement() {
       s = new IfStatement(e,tb,fb);
   } else if(match(Token::DO)){//Agregamos la sentencia en el parser par aque reconozca el do while
     tb = parseBody();
-    if (!match(Token::WHILE)){exit(0);};
+    if (!match(Token::WHILE)) parserError("Error esperaba while");
     e = parseExp();
     s = new do_WhileStatement(e,tb);
   } else if (match(Token::WHILE)) {
