@@ -1,6 +1,6 @@
 # Proyect_Compiladores
 
 
-## Paolo ...
-## Marcelo ...
+## Paolo Vásquez
+## Marcelo Zuloeta
 ## Sandoval Rivera Jerimy
