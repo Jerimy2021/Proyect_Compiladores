@@ -7,7 +7,7 @@
 #include "imp_printer.hh"
 #include "imp_interpreter.hh"
 #include "imp_typechecker.hh"
-//#include "imp_codegen.hh"
+#include "imp_codegen.hh"
 
 int main(int argc, const char* argv[]) {
 
@@ -30,7 +30,7 @@ int main(int argc, const char* argv[]) {
   ImpInterpreter interpreter;
   ImpTypeChecker checker;
 
-  //ImpCodeGen cg;
+  ImpCodeGen cg;
   
   printer.print(program);
   
@@ -40,11 +40,11 @@ int main(int argc, const char* argv[]) {
   cout << endl << "Run program:" << endl;
   interpreter.interpret(program);
 
-  //string outfname = argv[1];
-  //outfname += ".sm";
-  //cout << endl << "Compiling to: " << outfname << endl;
-  //cg.codegen(program, outfname);
+  string outfname = argv[1];
+  outfname += ".sm";
+  cout << endl << "Compiling to: " << outfname << endl;
+  cg.codegen(program, outfname);
 
-  //delete program;
+  delete program;
 
 }

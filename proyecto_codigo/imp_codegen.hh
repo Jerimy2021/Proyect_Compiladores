@@ -24,6 +24,7 @@ public:
   int visit(PrintStatement*);
   int visit(IfStatement*);
   int visit(WhileStatement*);
+  int visit(do_WhileStatement*);//Do-while statement
   int visit(ForStatement*);
   
   int visit(BinaryExp* e);

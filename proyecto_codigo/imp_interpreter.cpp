@@ -85,9 +85,11 @@ int ImpInterpreter::visit(WhileStatement* s) {
 //Implementacion de un do while en Imp
 int ImpInterpreter::visit(do_WhileStatement* s)
 {
-    s->body->accept(this); //do
-  while (s->cond->accept(this))
-    s->body->accept(this); //while
+  do
+  {
+    s->body->accept(this);
+  } while (s->cond->accept(this));
+  
   return 0;
 };
 
