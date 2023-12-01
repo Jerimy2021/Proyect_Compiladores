@@ -17,6 +17,7 @@ public:
   //Agregamos la clase virtual del do_while 
   virtual int visit(do_WhileStatement* e) = 0;
   virtual int visit(ForStatement* e) = 0;
+  virtual int visit(JumpStatement* e) = 0;
   
   virtual int visit(BinaryExp* e) = 0;
   virtual int visit(UnaryExp* e) = 0;

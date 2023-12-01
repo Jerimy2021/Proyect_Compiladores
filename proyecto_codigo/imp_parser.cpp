@@ -3,11 +3,11 @@
 #include "imp_parser.hh"
 
 
-const char* Token::token_names[35] = {
+const char* Token::token_names[37] = {
   "LPAREN" , "RPAREN", "PLUS", "MINUS", "MULT","DIV","EXP","LT","LTEQ","EQ",
   "NUM", "ID", "PRINT", "SEMICOLON", "COMMA", "ASSIGN", "CONDEXP", "IF", "THEN", "ELSE", "ENDIF", "WHILE", "DO",
   "ENDWHILE", "ERR", "END", "VAR" , "NOT", "TRUE", "FALSE", "AND", "OR"
-  "FOR", "COLON" , "ENDFOR" };
+  "FOR", "COLON" , "ENDFOR", "CONTINUE", "BREAK"};
 
 Token::Token(Type type):type(type) { lexema = ""; }
 
@@ -45,7 +45,8 @@ Scanner::Scanner(string s):input(s),first(0),current(0) {
   reserved["or"] = Token::OR;
   reserved["for"] = Token::FOR;
   reserved["endfor"] = Token::ENDFOR;
-  
+  reserved["continue"]=Token::CONTINUE;
+  reserved["break"]=Token::BREAK;
 }
 
 Token* Scanner::nextToken() {
@@ -56,12 +57,15 @@ Token* Scanner::nextToken() {
   while (c == ' ' || c == '\t'  || c == '\n') c = nextChar();
   if (c == '\0') return new Token(Token::END);
   startLexema();
+
   if (isdigit(c)) {
     c = nextChar();
     while (isdigit(c)) c = nextChar();
     rollBack();
     token = new Token(Token::NUM, getLexema());
-  } else if (isalpha(c)) {
+  } 
+  
+  else if (isalpha(c)) {
     c = nextChar();
     while (isalpha(c) || isdigit(c) || c=='_') c = nextChar();
     rollBack();
@@ -71,7 +75,9 @@ Token* Scanner::nextToken() {
       token = new Token(ttype);
     else
       token = new Token(Token::ID, getLexema()); 
-  } else if (strchr("()+-*/;=<,!:", c)) {
+  } 
+  
+  else if (strchr("()+-*/;=<,!:", c)) {
     switch(c) {
     case '(': token = new Token(Token::LPAREN); break;
     case ')': token = new Token(Token::RPAREN); break;
@@ -81,8 +87,38 @@ Token* Scanner::nextToken() {
       c = nextChar();
       if (c == '*') token = new Token(Token::EXP);
       else { rollBack(); token = new Token(Token::MULT); }
-      break;     
-    case '/': token = new Token(Token::DIV); break;
+      break;
+    
+    case '/':
+    {
+     //beginning case of a single line comment
+      c = nextChar();
+      if (c == '/') 
+      { //if next char is another '/', we are in a comment
+        c=nextChar();
+        while (c !='\0' && c != '\n') 
+        {
+          c = nextChar();
+        } //until we end line
+        switch (c){
+          // next token keeps waiting if the end doesn't comes yet
+          case '\n':
+            token = nextToken();
+            cout << token << endl;
+            break;
+          case '\0':
+            token = new Token(Token::END); 
+          break;          
+        }
+      }
+      // If next char isn't '/' then its a division:
+      else { 
+        rollBack(); 
+        token = new Token(Token::DIV); 
+      }
+      break;
+    }     
+    //case '/': token = new Token(Token::DIV); break;
     case ';': token = new Token(Token::SEMICOLON); break;
     case ',': token = new Token(Token::COMMA); break;
     case '!': token = new Token(Token::NOT); break;
@@ -318,7 +354,9 @@ Stm* Parser::parseStatement() {
     tb = parseBody();
     if (!match(Token::ENDFOR)) parserError("Esperaba ENDFOR en for");
     s = new ForStatement(var,e,e2,tb);
-  } else {
+  } else if (match(Token::CONTINUE)) s = new JumpStatement(JumpType::CONTINUE);
+  else if (match(Token::BREAK)) s = new JumpStatement(JumpType::BREAK);
+  else {
     cout << "No se encontro Statement" << endl;
     exit(0);
   }

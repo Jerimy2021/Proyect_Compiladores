@@ -97,6 +97,7 @@ ImpType CondExp::accept(TypeVisitor* v) {
   return v->visit(this);
 }
 
+JumpStatement::JumpStatement(JumpType type):type(type) { }
 AssignStatement::AssignStatement(string id, Exp* e):id(id), rhs(e) { }
 PrintStatement::PrintStatement(Exp* e):e(e) { }
 IfStatement::IfStatement(Exp* c,Body *tb, Body* fb):cond(c),tbody(tb), fbody(fb) { }
@@ -113,6 +114,7 @@ VarDecList::VarDecList():vdlist() {}
 Body::Body(VarDecList* vdl, StatementList* sl):var_decs(vdl), slist(sl) {}
 Program::Program(Body* b):body(b) {}
 
+JumpStatement::~JumpStatement() {}
 Stm::~Stm() {}
 AssignStatement::~AssignStatement() { delete rhs; }
 PrintStatement::~PrintStatement() { delete e; }
@@ -157,6 +159,9 @@ int ForStatement::accept(ImpVisitor* v) {
 
 void StatementList::add(Stm* s) { slist.push_back(s);  }
 
+int JumpStatement::accept(ImpVisitor* v) {
+  return v->visit(this);
+}
 int StatementList::accept(ImpVisitor* v) {
   return v->visit(this);
 }
@@ -177,9 +182,13 @@ int Body::accept(ImpVisitor* v) {
 
 int Program::accept(ImpVisitor* v) {
   return v->visit(this);
-}
+};
 
 // Type visitor
+
+void JumpStatement::accept(TypeVisitor* v){
+  return v->visit(this);
+};
 void AssignStatement::accept(TypeVisitor* v) {
   return v->visit(this);
 }

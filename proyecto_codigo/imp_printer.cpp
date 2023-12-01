@@ -98,10 +98,14 @@ int ImpPrinter::visit(ForStatement* s) {
   s->e2->accept(this);
   cout << "do" << endl;
   s->body->accept(this);
-  cout << "endwhile";
+  cout << "endfor";
   return 0;
 }
 
+int ImpPrinter::visit(JumpStatement* s) {//p4
+  cout << "skip";
+  return 0;
+}
 int ImpPrinter::visit(BinaryExp* e) {
   e->left->accept(this);
   cout << ' ' << Exp::binopToString(e->op) << ' ';

@@ -7,6 +7,7 @@ ImpTypeChecker::ImpTypeChecker():inttype(),booltype() {
 
 void ImpTypeChecker::typecheck(Program* p) {
   env.clear();
+  bucledepila.clear(); 
   p->accept(this);
   return;
 }
@@ -86,23 +87,35 @@ void ImpTypeChecker::visit(IfStatement* s) {
 }
 
 void ImpTypeChecker::visit(WhileStatement* s) {
+  bucledepila.push_back(s);
   if (!s->cond->accept(this).match(booltype)) {
     cout << "Condicional en WhileStm debe de ser: " << booltype << endl;
     exit(0);
   }  
   s->body->accept(this);
+  bucledepila.pop_back();
  return;
 }
 
 // Creamos el metodo de ejecucion del do while
 void ImpTypeChecker::visit(do_WhileStatement* s){
+  bucledepila.push_back(s);
   s->body->accept(this); 
   ImpType etype = s->cond->accept(this);
   if (!etype.match(booltype)) {cout<<"Condicional debe ser do-while deberia ser bool"<<endl; exit(0);}
+  bucledepila.pop_back();
   return;
 }
 
+void ImpTypeChecker::visit(JumpStatement* s) {//4
+  if (bucledepila.size()==0) {
+    cout << "JumpStatement fuera de bucle" << endl;
+    exit(0);
+  }
+  return;
+}
 void ImpTypeChecker::visit(ForStatement* s) {
+  bucledepila.push_back(s);
   ImpType t1 = s->e1->accept(this);
   ImpType t2 = s->e2->accept(this);
   if (!t1.match(inttype) || !t2.match(inttype)) {
@@ -113,6 +126,7 @@ void ImpTypeChecker::visit(ForStatement* s) {
   env.add_var(s->id,inttype);
   s->body->accept(this);
   env.remove_level();
+  bucledepila.pop_back();
  return;
 }
 

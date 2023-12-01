@@ -12,6 +12,18 @@
 #include "imp_visitor.hh"
 #include "environment.hh"
 
+
+class LoopEntry{
+public:
+  Stm* padre;
+  string lcont;
+  string lbreak;
+  LoopEntry(Stm* p, string c, string b){
+    this->padre = p;
+    this->lcont = c;
+    this->lbreak = b;
+  }
+};
 class ImpCodeGen : public ImpVisitor {
 public:
   void codegen(Program*, string outfname);
@@ -26,7 +38,7 @@ public:
   int visit(WhileStatement*);
   int visit(do_WhileStatement*);//Do-while statement
   int visit(ForStatement*);
-  
+  int visit(JumpStatement*);//p4
   int visit(BinaryExp* e);
   int visit(UnaryExp* e);
   int visit(NumberExp* e);
@@ -45,6 +57,9 @@ private:
   void codegen(string label, string instr, int arg);
   void codegen(string label, string instr, string jmplabel);
   string next_label();
+
+  vector<LoopEntry> bucledepila;
+  
 };
 
 

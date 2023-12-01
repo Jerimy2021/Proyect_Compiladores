@@ -19,7 +19,9 @@ int ImpInterpreter::visit(Body* b) {
   return 0;
 }
 
-
+int ImpInterpreter::visit(JumpStatement* s) {//p4
+  return 0;
+}
 int ImpInterpreter::visit(VarDecList* decs) {
   list<VarDec*>::iterator it;
   for (it = decs->vdlist.begin(); it != decs->vdlist.end(); ++it) {
