@@ -111,30 +111,77 @@ int ImpCodeGen::visit(IfStatement* s) {
 int ImpCodeGen::visit(WhileStatement* s) {
   string l1 = next_label();
   string l2 = next_label();
-
+  bucledepila.push_back(LoopEntry(s,l1,l2));
   codegen(l1,"skip");
   s->cond->accept(this);
   codegen(nolabel,"jmpz",l2);
   s->body->accept(this);
   codegen(nolabel,"goto",l1);
   codegen(l2,"skip");
-
+  bucledepila.pop_back();
   return 0;
 }
 int ImpCodeGen::visit(do_WhileStatement* s){
   string l1 = next_label();
   string l2 = next_label();
-
+  bucledepila.push_back(LoopEntry(s,l2,l1));
   codegen(l1,"skip");
   s->body->accept(this);
   s->cond->accept(this);
   codegen(nolabel,"jmpz",l2);
   codegen(nolabel,"goto",l1);
   codegen(l2,"skip");
-
+  bucledepila.pop_back();
   return 0;
 }
 int ImpCodeGen::visit(ForStatement* s) {
+
+  direcciones.add_level();
+  int preloop = siguiente_direccion;
+
+  direcciones.add_var(s->id, siguiente_direccion);
+  siguiente_direccion++;
+
+  s->e1->accept(this);
+  codegen(nolabel, "store", direcciones.lookup(s->id));
+  s->e2->accept(this);
+
+  string begin = next_label();
+  string body = next_label();
+  string end = next_label();
+
+  bucledepila.push_back(LoopEntry(s,body,end));
+  codegen(begin, "skip");
+  codegen(nolabel, "dup");
+  codegen(nolabel, "load", direcciones.lookup(s->id));
+  codegen(nolabel, "ge");
+  codegen(nolabel, "jmpn", body);
+
+  codegen(nolabel, "goto", end);
+  codegen(body, "skip");
+
+  s->body->accept(this);
+
+  codegen(nolabel, "load", direcciones.lookup(s->id));
+  codegen(nolabel, "push", 1);
+  codegen(nolabel, "add");
+  codegen(nolabel, "store", direcciones.lookup(s->id));
+  codegen(nolabel, "goto", begin);
+
+  codegen(end, "skip");
+  codegen(nolabel, "pop");
+
+  direcciones.remove_level();
+  siguiente_direccion=preloop;
+  bucledepila.pop_back();
+  return 0;
+};
+
+int ImpCodeGen::visit(JumpStatement* s){
+  if (s->type == JumpType::BREAK)
+    codegen(nolabel,"goto",bucledepila.back().lbreak);
+  else
+    codegen(nolabel,"goto",bucledepila.back().lcont);
   return 0;
 }
 
@@ -150,6 +197,8 @@ int ImpCodeGen::visit(BinaryExp* e) {
   case LT:  op = "lt"; break;
   case LTEQ: op = "le"; break;
   case EQ:  op = "eq"; break;
+  case OR: op="or";break;
+  case AND: op="and"; break;
   default: cout << "binop " << Exp::binopToString(e->op) << " not implemented" << endl;
   }
   codegen(nolabel, op);
@@ -181,6 +230,8 @@ int ImpCodeGen::visit(NumberExp* e) {
 }
 
 int ImpCodeGen::visit(BoolConstExp* e) {
+  if (e->b == false) codegen(nolabel, "push", 0);
+  else codegen(nolabel, "push",1);
   return 0;
 }
 

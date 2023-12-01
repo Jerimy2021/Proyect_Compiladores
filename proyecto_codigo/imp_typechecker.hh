@@ -16,7 +16,8 @@ private:
   Environment<ImpType> env;
   ImpType booltype;
   ImpType inttype;
-
+  vector<Stm*>bucledepila;
+  
 public:
   void typecheck(Program*);
   void visit(Program*);
@@ -28,7 +29,7 @@ public:
   void visit(PrintStatement*);
   void visit(IfStatement*);
   void visit(WhileStatement*);
-
+  void visit(JumpStatement*);
   //Agregamos el visit al do while statement en void en el typechecker
   void visit(do_WhileStatement*);
   void visit(ForStatement*);

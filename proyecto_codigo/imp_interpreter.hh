@@ -27,6 +27,7 @@ public:
   //Agregamos el metodo del interprete_ do while
   int visit(do_WhileStatement*);
   int visit(ForStatement*);
+  int visit(JumpStatement*);
   
   int visit(BinaryExp* e);
   int visit(UnaryExp* e);

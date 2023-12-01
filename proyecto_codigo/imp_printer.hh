@@ -19,6 +19,7 @@ public:
   //Agregamos el metodo en print
   int visit(do_WhileStatement*);
   int visit(ForStatement*);
+  int visit(JumpStatement*);//p4
   
   int visit(BinaryExp* e);
   int visit(UnaryExp* e);

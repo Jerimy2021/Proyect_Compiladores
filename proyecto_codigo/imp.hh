@@ -19,6 +19,9 @@ class TypeVisitor;
 enum BinaryOp { PLUS, MINUS, MULT, DIV, EXP, LT, LTEQ, EQ, AND, OR};
 enum UnaryOp { NEG, NOT };
   
+// adittion
+enum JumpType { CONTINUE, BREAK };
+
 class Exp {
 public:
   virtual int accept(ImpVisitor* v) = 0;
@@ -218,6 +221,15 @@ public:
   ~Program();
 };
 
+
+class JumpStatement : public Stm {
+public:
+  JumpType type;
+  JumpStatement(JumpType type);
+  int accept(ImpVisitor* v);
+  void accept(TypeVisitor* v);
+  ~JumpStatement();
+};
 
 
 #endif
